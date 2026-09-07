@@ -422,6 +422,20 @@ jobs:
       - run: bun run findable-check
         working-directory: apps/web
 
+      # The Docket's tabs show what we hold.
+      #
+      # Reported plainly: "the executive and SCOTUS tabs don't show anything
+      # when clicked but there are definitely things that could populate in our
+      # database." Nothing was broken in the usual sense — every line compiled
+      # and every request answered 200. Both tabs were wired to /trending, which
+      # deliberately returns nothing until a record has five interactions, so on
+      # a platform with no votes they rendered "No executive orders yet" over a
+      # database holding 1,536 of them.
+      #
+      # Only a browser clicking the tab can catch that.
+      - run: bun run docket-tabs-check
+        working-directory: apps/web
+
   mobile:
     name: mobile
     runs-on: ubuntu-latest
