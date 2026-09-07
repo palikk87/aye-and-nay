@@ -806,23 +806,6 @@ export default function DiscoverScreen() {
   // Newest synced bills — keeps the "All Legislation" list up to date even
   // before the community has voted on them.
   const { data: latestBillsData, refetch: refetchLatestBills } = useLatestReferences('bill', 30);
-  /*
-   * NEWEST-FIRST FOR THE OTHER TWO BRANCHES TOO.
-   *
-   * /trending only returns a record once it has five interactions, so that
-   * nothing is stamped "trending" out of an empty database. On a platform this
-   * young it therefore returns NOTHING — for every branch. Legislation survived
-   * because it quietly had a second source; Executive Orders and Supreme Court
-   * Cases had only the one, so both tabs rendered empty while the database held
-   * 1,536 orders and 75 rulings.
-   *
-   * "Nothing is trending" is true. "We have no executive orders" is not, and
-   * that is what the reader was shown.
-   */
-  const { data: latestEoData, isLoading: latestEoLoading, refetch: refetchLatestEo } =
-    useLatestReferences('executive_order', 10);
-  const { data: latestScotusData, isLoading: latestScotusLoading, refetch: refetchLatestScotus } =
-    useLatestReferences('scotus_case', 10);
 
   // Toggle branch expansion
   const toggleBranch = useCallback((branch: GovernmentBranch) => {
@@ -842,19 +825,9 @@ export default function DiscoverScreen() {
       refetchEoRefs(),
       refetchScotusRefs(),
       refetchLatestBills(),
-      refetchLatestEo(),
-      refetchLatestScotus(),
     ]);
     setRefreshing(false);
-  }, [
-    refetch,
-    refetchBillRefs,
-    refetchEoRefs,
-    refetchScotusRefs,
-    refetchLatestBills,
-    refetchLatestEo,
-    refetchLatestScotus,
-  ]);
+  }, [refetch, refetchBillRefs, refetchEoRefs, refetchScotusRefs, refetchLatestBills]);
 
   // Filterable bill list: newest synced bills first, then popular ones and any
   // DB bills. Static mock bills are only a fallback when the backend is unreachable.
@@ -897,20 +870,13 @@ export default function DiscoverScreen() {
 
   // 10 most popular executive orders (live, daily-synced)
   const executiveOrderItems = useMemo(() => {
-    const trending = (eoRefsData?.references ?? []).map(referenceToExecutiveOrder);
-    if (trending.length > 0) return trending.slice(0, 10);
-    return (latestEoData?.references ?? []).map(referenceToExecutiveOrder).slice(0, 10);
-  }, [eoRefsData, latestEoData]);
-  /** Is this list showing what is popular, or simply what is newest? */
-  const eoByPopularity = (eoRefsData?.references ?? []).length > 0;
+    return (eoRefsData?.references ?? []).map(referenceToExecutiveOrder).slice(0, 10);
+  }, [eoRefsData]);
 
   // 10 most popular Supreme Court cases (live, daily-synced)
   const scotusItems = useMemo(() => {
-    const trending = (scotusRefsData?.references ?? []).map(referenceToScotusCase);
-    if (trending.length > 0) return trending.slice(0, 10);
-    return (latestScotusData?.references ?? []).map(referenceToScotusCase).slice(0, 10);
-  }, [scotusRefsData, latestScotusData]);
-  const scotusByPopularity = (scotusRefsData?.references ?? []).length > 0;
+    return (scotusRefsData?.references ?? []).map(referenceToScotusCase).slice(0, 10);
+  }, [scotusRefsData]);
 
   // Live government data — the SAME endpoint and query cache the Government tab
   // uses (/api/government/officials), so the Gov Map always matches it.
@@ -1203,13 +1169,11 @@ export default function DiscoverScreen() {
                   </Text>
                 </View>
                 <Text className="text-slate-400 text-sm mt-1">
-                  {eoByPopularity
-                    ? 'The 10 most popular presidential directives'
-                    : 'The 10 most recent presidential directives'}
+                  The 10 most popular presidential directives
                 </Text>
               </View>
 
-              {(eoRefsLoading || latestEoLoading) && executiveOrderItems.length === 0 ? (
+              {eoRefsLoading && executiveOrderItems.length === 0 ? (
                 <ActivityIndicator size="large" color="#F59E0B" className="mt-8" />
               ) : executiveOrderItems.length === 0 ? (
                 <SectionState
@@ -1236,13 +1200,11 @@ export default function DiscoverScreen() {
                   </Text>
                 </View>
                 <Text className="text-slate-400 text-sm mt-1">
-                  {scotusByPopularity
-                    ? 'The 10 most popular Supreme Court decisions'
-                    : 'The 10 most recent Supreme Court decisions'}
+                  The 10 most popular Supreme Court decisions
                 </Text>
               </View>
 
-              {(scotusRefsLoading || latestScotusLoading) && scotusItems.length === 0 ? (
+              {scotusRefsLoading && scotusItems.length === 0 ? (
                 <ActivityIndicator size="large" color="#8B5CF6" className="mt-8" />
               ) : scotusItems.length === 0 ? (
                 <SectionState

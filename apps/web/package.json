@@ -42,8 +42,7 @@
     "zip-district-check": "node scripts/zip-district-check.mjs dist",
     "signup-consent-check": "node scripts/signup-consent-check.mjs",
     "prerender": "node scripts/prerender.mjs dist",
-    "findable-check": "node scripts/findable-check.mjs dist",
-    "docket-tabs-check": "node scripts/docket-tabs-check.mjs dist"
+    "findable-check": "node scripts/findable-check.mjs dist"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

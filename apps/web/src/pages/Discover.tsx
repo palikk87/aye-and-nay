@@ -168,30 +168,9 @@ export default function Discover() {
     data: scotusRefsData, isLoading: scotusRefsLoading,
     isError: scotusRefsError, refetch: refetchScotusRefs,
   } = useTrendingReferences("scotus_case", 10);
-  /*
-   * NEWEST-FIRST, AS A SECOND SOURCE FOR EVERY BRANCH.
-   *
-   * WHY ALL THREE AND NOT JUST BILLS. /trending only returns a record once it
-   * has five interactions on it — deliberately, so nothing gets stamped
-   * "trending" out of an empty database. On a platform this young that means it
-   * returns NOTHING, for every branch. Legislation survived because it quietly
-   * had a second source; Executive Orders and Supreme Court Cases had only the
-   * one, so both tabs rendered empty while the database held 1,536 orders and
-   * 75 rulings.
-   *
-   * An empty browse tab is not an honest empty state here. "Nothing is
-   * trending" is true; "we have no executive orders" is not, and that is what
-   * the reader was shown.
-   */
+  // Newest synced bills — keeps the "All Legislation" list up to date even
+  // before the community has voted on them.
   const { data: latestBillsData } = useLatestReferences("bill", 30);
-  const { data: latestEoData, isLoading: latestEoLoading } = useLatestReferences(
-    "executive_order",
-    10,
-  );
-  const { data: latestScotusData, isLoading: latestScotusLoading } = useLatestReferences(
-    "scotus_case",
-    10,
-  );
 
   // Toggle branch expansion
   const toggleBranch = useCallback((branch: GovernmentBranch) => {
@@ -236,23 +215,15 @@ export default function Discover() {
       .slice(0, 10);
   }, [billRefsData, apiBillsData]);
 
-  // Most popular executive orders, or the newest ones when nothing has been
-  // voted on yet. Same two-source shape the bills list already had.
+  // 10 most popular executive orders (live, daily-synced)
   const executiveOrderItems = useMemo(() => {
-    const trending = (eoRefsData?.references ?? []).map(referenceToExecutiveOrder);
-    if (trending.length > 0) return trending.slice(0, 10);
-    return (latestEoData?.references ?? []).map(referenceToExecutiveOrder).slice(0, 10);
-  }, [eoRefsData, latestEoData]);
-  /** Is this list showing what is popular, or simply what is newest? */
-  const eoByPopularity = (eoRefsData?.references ?? []).length > 0;
+    return (eoRefsData?.references ?? []).map(referenceToExecutiveOrder).slice(0, 10);
+  }, [eoRefsData]);
 
   // 10 most popular Supreme Court cases (live, daily-synced)
   const scotusItems = useMemo(() => {
-    const trending = (scotusRefsData?.references ?? []).map(referenceToScotusCase);
-    if (trending.length > 0) return trending.slice(0, 10);
-    return (latestScotusData?.references ?? []).map(referenceToScotusCase).slice(0, 10);
-  }, [scotusRefsData, latestScotusData]);
-  const scotusByPopularity = (scotusRefsData?.references ?? []).length > 0;
+    return (scotusRefsData?.references ?? []).map(referenceToScotusCase).slice(0, 10);
+  }, [scotusRefsData]);
 
   // Live government data — the SAME endpoint and query cache the Government tab
   // uses (/api/government/officials), so the Gov Map always matches it.
@@ -595,13 +566,11 @@ export default function Discover() {
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {eoByPopularity
-                    ? "The 10 most popular presidential directives"
-                    : "The 10 most recent presidential directives"}
+                  The 10 most popular presidential directives
                 </p>
               </div>
 
-              {(eoRefsLoading || latestEoLoading) && executiveOrderItems.length === 0 ? (
+              {eoRefsLoading && executiveOrderItems.length === 0 ? (
                 <div className="flex justify-center py-10">
                   <Loader2 className="h-6 w-6 animate-spin text-amber-500" />
                 </div>
@@ -630,13 +599,11 @@ export default function Discover() {
                   </span>
                 </div>
                 <p className="mt-1 text-sm text-muted-foreground">
-                  {scotusByPopularity
-                    ? "The 10 most popular Supreme Court decisions"
-                    : "The 10 most recent Supreme Court decisions"}
+                  The 10 most popular Supreme Court decisions
                 </p>
               </div>
 
-              {(scotusRefsLoading || latestScotusLoading) && scotusItems.length === 0 ? (
+              {scotusRefsLoading && scotusItems.length === 0 ? (
                 <div className="flex justify-center py-10">
                   <Loader2 className="h-6 w-6 animate-spin text-purple-500" />
                 </div>
