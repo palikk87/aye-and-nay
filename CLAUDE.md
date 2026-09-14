@@ -26,6 +26,18 @@ history, never a build target.
 | Test data | `civicvoice_population` — 1,000 synthetic citizens. Never mix with production. |
 | Brand | bg `#0F172A`, accent `#F59E0B`, Fraunces (display) + Public Sans |
 
+## One project per session
+
+If another project's repo is on disk in this session, STOP and say so. Do not
+read it, do not grep it, do not cite its config. A cross-project grep is how one
+project's infrastructure gets attributed to another — it has already happened
+once, and SeeMyGD's Supabase setup got read as this platform's.
+
+This file is the only authority on this repo's stack. If it did not load
+automatically, READ IT before answering anything about hosting, infrastructure
+or the database. A `.env.example` is a template and proves nothing about
+production.
+
 Before pushing: `bun run verify`. After: `bun run deploy-check`.
 `bun run branches` shows what is stranded off `main`.
 
