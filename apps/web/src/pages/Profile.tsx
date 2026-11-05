@@ -23,6 +23,7 @@ import {
   Pencil,
 } from "lucide-react";
 import { MotionDiv } from "@/components/civic/Motion";
+import { CivicScorePlaque } from "@/components/civic/CivicScorePlaque";
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog";
 import { AppShell } from "@/components/layout/AppShell";
 import { categoryColors, categoryLabels } from "@/lib/mobile/mock-data";
@@ -502,6 +503,11 @@ export default function Profile() {
               </button>
             </div>
           </div>
+
+          {/* CIVIC SCORE. Moved here off the Public Square: it is a record of
+              what you have done, so it sits with the rest of your record
+              rather than at the top of the busiest page in the app. */}
+          <CivicScorePlaque className="mx-4 mb-6" />
 
           {/* Stats */}
           <div className="flex px-4 mb-6 gap-2">

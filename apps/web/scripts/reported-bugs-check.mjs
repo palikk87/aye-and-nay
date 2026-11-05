@@ -397,8 +397,12 @@ try {
 //
 // The plaque read a score kept in localStorage, so two devices disagreed, and
 // pressing it opened the reader's profile rather than anything about the score.
+//
+// IT IS ON THE PROFILE NOW, not the feed — it is a record of what you have
+// done, so it sits with the rest of your record. Both original bugs are still
+// asserted here; only the page they are asserted on has moved.
 try {
-  const p = await page("/feed");
+  const p = await page("/profile");
 
   // The number on the plaque is the server's, not a remembered one.
   const shown = await p.evaluate(() => document.body.innerText);
@@ -413,7 +417,7 @@ try {
 
   const plaque = p.getByRole("button", { name: /civic score/i });
   if (!(await plaque.count())) {
-    failures.push("no civic score plaque on the feed");
+    failures.push("no civic score plaque on the profile");
   } else {
     await plaque.first().click();
     await p.waitForTimeout(1200);
